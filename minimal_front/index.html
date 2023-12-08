@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <style>
+        .container 
+        {
+            width: 100%;
+        }
+
+        form 
+        {
+            margin: auto;
+            width: 80%;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        input[type="radio"]
+        {
+            display: none;
+        }
+
+        input[type="radio"]:checked+label .circle
+        { 
+            border-color: black;
+            border-width: 2px;
+            border-style: solid;
+            height: 116px;
+            width: 116px;
+        } 
+
+        .circle
+        {
+            height: 120px;
+            width: 120px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: row;
+            align-content: center;
+            align-items: center;
+            align-self: center;
+            justify-content: center;
+        }
+
+        .green
+        { 
+            background-color: green;
+        }
+
+        .yellow
+        { 
+            background-color: yellow;
+        }
+
+        .red
+        { 
+            background-color: red;
+        }
+
+        label
+        {
+            display: flex;
+            align-content: center;
+            align-items: center;
+            align-self: center;
+        }
+
+        textarea
+        {
+            margin-top: 25px;
+            margin-bottom: 25px;
+        }
+        
+    </style>
+    </head>
+    <div class="container">
+    <form action="" method="" id="feedback_m365">
+        <input type="radio" id="happy" name="satisfaction" value="happy">
+        <label for="happy"><div class="circle green"><div>happy</div></div></label>
+        <input type="radio" id="meh" name="satisfaction" value="meh">
+        <label for="meh"><div class="circle yellow"><div>meh</div></div></label>
+        <input type="radio" id="sad" name="satisfaction" value="sad">
+        <label for="sad"><div class="circle red"><div>sad</div></div></label>
+        <textarea id="comment" name="comment" rows="4" cols="15" placeholder="enter comments"></textarea>
+        <input type="submit" value="Submit">
+    </form>
+    </div>
+
+    <script>
+        let loginForm = document.getElementById("feedback_m365");
+        let url = "http://localhost:5063/";
+        loginForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            // handle submit
+            let satisfaction = document.querySelector('#feedback_m365 input[type="radio"]:checked').value;
+            console.log(satisfaction);
+            let textarea = document.querySelector('#feedback_m365 #comment').value;
+            console.log(textarea);
+
+            let datetime = new Date,
+                dformat = [datetime.getMonth()+1,
+                datetime.getDate(),
+                datetime.getFullYear()].join('/')+' '+
+                [datetime.getHours(),
+                datetime.getMinutes(),
+                datetime.getSeconds()].join(':');
+            console.log(dformat);
+
+            let data = {
+                happiness : satisfaction,
+                comment : textarea,
+                timestamp : dformat
+            };
+
+            //send no-cors request as url
+            console.log("Sending data to " + url);
+            console.log(data);
+
+            const XHR = new XMLHttpRequest();
+
+            const urlEncodedDataPairs = [];
+
+            // Turn the data object into an array of URL-encoded key/value pairs.
+            for (const [name, value] of Object.entries(data)) {
+            urlEncodedDataPairs.push(
+                `${encodeURIComponent(name)}=${encodeURIComponent(value)}`,
+            );
+            }
+
+            // Combine the pairs into a single string and replace all %-encoded spaces to
+            // the '+' character; matches the behavior of browser form submissions.
+            const urlEncodedData = urlEncodedDataPairs.join("&").replace(/%20/g, "+");
+
+            // Define what happens on successful data submission
+            XHR.addEventListener("load", (event) => {
+            alert("Yeah! Data sent and response loaded.");
+            });
+
+            // Define what happens in case of an error
+            XHR.addEventListener("error", (event) => {
+            alert("Oops! Something went wrong.");
+            });
+
+            // Set up our request
+            XHR.open("POST", url);
+
+            // Add the required HTTP header for form data POST requests
+            XHR.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+            // Finally, send our data.
+            console.log(urlEncodedData);
+            XHR.send(urlEncodedData);
+            //disable clicking here
+        });
+
+    </script>
+</html>

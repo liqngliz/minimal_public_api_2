@@ -1,3 +1,6 @@
+using System.Collections.Specialized;
+using System.Web;
+
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -22,8 +25,14 @@ app.MapGet("/", (HttpContext httpContext) => {
     });
 
 
-app.MapPost("/", (HttpContext httpContext) => {
-    return "cors";
+app.MapPost("/", async (HttpContext httpContext) => {
+    string body;
+
+    using (StreamReader reader = new StreamReader (httpContext.Request.Body)) {
+        body = await reader.ReadToEndAsync ();
+    }
+    
+    return body;
     });
 
 app.Run();
